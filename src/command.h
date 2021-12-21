@@ -20,6 +20,9 @@ struct command
 struct command *get_command();
 char* get_input_line(void);
 char** parse_input_line(char *curr_line, int *n_inputs);
+void set_bg_flag(bool bg_flag, char** inputs, int *n_inputs);
+
+void populate_command(struct command *curr_command, char** inputs, int *n_inputs);
 struct command *build_unexpanded_command(char** inputs, int *n_inputs);
 void get_argc_and_redirs(struct command* curr_command, char** inputs, int index_limit);
 void populate_args(int arg_count, char** args, char** inputs);

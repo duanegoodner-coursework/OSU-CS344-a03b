@@ -7,6 +7,9 @@
 #include "command.h"
 #include "utilities.h"
 
+
+
+
 // Gets input entered by user, converts to a command struct.
 struct command* get_command() {
 
@@ -15,6 +18,10 @@ struct command* get_command() {
 
 //  Values of command structure members will be initialized and/or set later
     struct command *curr_command;
+    curr_command->next = NULL;
+    curr_command->process_id = -5;
+    // curr_command->input_redirect = NULL;
+    // curr_command->output_redirect = NULL;
 
     // get command line input
     char* curr_line = get_input_line();
@@ -30,7 +37,9 @@ struct command* get_command() {
 
     // if not a blank line or command, populate members of command struct
     } else {
-        curr_command = build_unexpanded_command(inputs, &n_inputs);
+        // set_bg_flag(curr_command->background, inputs, &n_inputs);
+        populate_command(curr_command, inputs, &n_inputs);
+        // curr_command = build_unexpanded_command(inputs, &n_inputs);
     }
 
     // Since build_unexpanded_command allocated and copied to new memory
@@ -47,11 +56,43 @@ struct command* get_command() {
     free(inputs);
 
     // convert args of command struct as needed based on variable expansion rules
+    // char* expand_repl = malloc_atoi(getpid());
+    // expand_var(curr_command, VAR_EXPAND, expand_repl);
+    // free(expand_repl);
+
+    return curr_command;
+}
+
+void set_bg_flag(bool bg_flag, char** inputs, int *n_inputs) {
+    bg_flag = bg_command_check(inputs, n_inputs);
+}
+
+
+
+void populate_command(struct command *curr_command, char** inputs, int *n_inputs) {
+
+    int index_limit = *n_inputs;
+    int arg_count = 0;
+
+
+    curr_command->background = bg_command_check(inputs, n_inputs);
+
+    curr_command->input_redirect = NULL;
+    curr_command->output_redirect = NULL;
+
+
+
+    index_limit = index_limit - (int) curr_command->background;
+
+    get_argc_and_redirs(curr_command, inputs, index_limit);
+
+    populate_args(curr_command->arg_count, curr_command->args, inputs);
+
     char* expand_repl = malloc_atoi(getpid());
     expand_var(curr_command, VAR_EXPAND, expand_repl);
     free(expand_repl);
 
-    return curr_command;
+
 }
 
 // Takes array of elements of input line and builds command struct
@@ -282,7 +323,7 @@ void free_command(struct command* curr_command) {
         }
 
         // free the pointer to the actual command structure
-        free(curr_command);
+        // free(curr_command);
     }
 }
 

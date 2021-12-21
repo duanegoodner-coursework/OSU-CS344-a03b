@@ -26,8 +26,11 @@ int main(void) {
     while (run_flag) {
 
         // display the prompt
+        fflush(stdin);
         printf(C_PROMPT);
         fflush(stdout);
+
+
 
         /* Build a command struct based on user input and variable expansion.
         If user enters blank line or comment, NULL is returned. */
